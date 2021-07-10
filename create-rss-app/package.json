@@ -1,0 +1,21 @@
+{
+  "name": "create-rss-app",
+  "version": "0.1.0",
+  "description": "CLI for create simple js (or ts) SPA application",
+  "author": "Kris Casper",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai297/create-rss-app.git",
+    "directory": "create-rss-app"
+  },
+  "bin": {
+    "create-rss-app": "./index.js"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.1"
+  }
+}
