@@ -22,8 +22,9 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 
   if (projectNameIndex < 0) return out.specifyProjectName();
 
-  const flags = args.filter(v => /^--[a-z]{1,10}$/i.test(v)).map(v => v.toLowerCase());
-  const isConfigs = flags.includes('--configs') || flags.includes('--c');
+  const flags = args.filter(v => /^-[-a-z]{2,10}$/i.test(v)).map(v => v.toLowerCase());
+  const isConfigs = flags.includes('--configs') || flags.includes('-c');
+  const isUseTs = flags.includes('--typescript') || flags.includes('-ts');
 
   const [ projectName ] = args.splice(projectNameIndex, 1);
   const templatePath = path.resolve(__dirname, 'template');
@@ -63,20 +64,26 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   // Create configs.
   if (isConfigs) try {
     fs.copyFileSync(path.join(templatePath, 'webpack.config.js'), path.join(projectRoot, 'webpack.config.js'));
-    fs.copyFileSync(path.join(templatePath, 'tsconfig.json'), path.join(projectRoot, 'tsconfig.json'));
-    fs.copyFileSync(path.join(templatePath, 'modules.d.ts'), path.join(projectRoot, 'modules.d.ts'));
-    out.info('  + Webpack config created.')
   } catch {
-    out.error('  - Failed to create config files.');
+    out.error('  - Failed to create webpack config...');
     removeProjectDir();
     return 1;
   }
+  if (isConfigs || isUseTs) try {
+    fs.copyFileSync(path.join(templatePath, 'tsconfig.json'), path.join(projectRoot, 'tsconfig.json'));
+    fs.copyFileSync(path.join(templatePath, 'modules.d.ts'), path.join(projectRoot, 'modules.d.ts'));
+  } catch {
+    out.error('  - Failed to create tsconfig...');
+    removeProjectDir();
+    return 1;
+  }
+  out.info('  + Config files created.');
 
   // Copy template files.
   try {
     // fs.copyFileSync(path.join(templatePath, '.gitignore'), path.join(projectRoot, '.gitignore'));
     fs.copyFileSync(path.join(templateSrcPath, 'index.html'), path.join(projectSrc, 'index.html'));
-    fs.copyFileSync(path.join(templateSrcPath, 'index.js'), path.join(projectSrc, 'index.js'));
+    fs.copyFileSync(path.join(templateSrcPath, 'index.js'), path.join(projectSrc, isUseTs ? 'index.ts' : 'index.js'));
     fs.copyFileSync(path.join(templateSrcPath, 'style.css'), path.join(projectSrc, 'style.css'));
     fs.copyFileSync(path.join(templateSrcPath, 'images', 'success-cat.svg'), path.join(projectSrcImages, 'success-cat.svg'));
     out.info('  + Template created.');
