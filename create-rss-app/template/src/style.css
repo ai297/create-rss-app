@@ -6,7 +6,12 @@ body {
   justify-content: center;
   color: white;
   text-transform: uppercase;
-  background-color: midnightblue;
+  background-color: #363636;
 }
 
-img { max-width: 200px; }
+h1 { color: #e6c300; }
+
+img {
+  width: 90vw;
+  max-width: 256px;
+}

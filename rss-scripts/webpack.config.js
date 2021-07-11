@@ -7,6 +7,15 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const __ = (d) => d ?? __dirname;
 
+const getEntryPoint = (projectDir) => fs.existsSync(path.join(projectDir, 'src', 'index.ts')) ? './index.ts' : './index.js';
+
+const getTsConfigPath = (projectDir) => {
+  const projectTsConfigPath = path.join(projectDir, 'tsconfig.json');
+  return fs.existsSync(projectTsConfigPath)
+    ? projectTsConfigPath
+    : path.resolve(__dirname, './tsconfig.json');
+};
+
 const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
@@ -18,7 +27,7 @@ const devServer = (isDev) => !isDev ? {} : {
 module.exports = ({ development, dirname }) => ({
   mode: development ? 'development' : 'production',
   devtool: development ? 'inline-source-map' : false,
-  entry: fs.existsSync(path.join(__(dirname), 'src', 'index.ts')) ? './index.ts' : './index.js',
+  entry: getEntryPoint(__(dirname)),
   context: path.join(__(dirname), 'src'),
   output: {
     filename: 'bundle.[contenthash].js',
@@ -31,7 +40,7 @@ module.exports = ({ development, dirname }) => ({
         test: /\.[tj]s$/,
         loader: require.resolve('ts-loader'),
         options: {
-          configFile: path.resolve(__dirname, './tsconfig.json'),
+          configFile: getTsConfigPath(__(dirname)),
         },
         exclude: /node_modules/,
       },
