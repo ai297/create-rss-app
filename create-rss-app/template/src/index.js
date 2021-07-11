@@ -1,4 +1,4 @@
-import image from './images/success-cat.svg';
+import image from './images/lazy.png';
 
 const subHeader = document.createElement('h2');
 subHeader.innerHTML = 'This elements was created by js';

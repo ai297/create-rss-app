@@ -85,7 +85,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
     fs.copyFileSync(path.join(templateSrcPath, 'index.html'), path.join(projectSrc, 'index.html'));
     fs.copyFileSync(path.join(templateSrcPath, 'index.js'), path.join(projectSrc, isUseTs ? 'index.ts' : 'index.js'));
     fs.copyFileSync(path.join(templateSrcPath, 'style.css'), path.join(projectSrc, 'style.css'));
-    fs.copyFileSync(path.join(templateSrcPath, 'images', 'success-cat.svg'), path.join(projectSrcImages, 'success-cat.svg'));
+    fs.copyFileSync(path.join(templateSrcPath, 'images', 'lazy.png'), path.join(projectSrcImages, 'lazy.png'));
     out.info('  + Template created.');
   } catch {
     out.error('  - Failed to create project files.');
