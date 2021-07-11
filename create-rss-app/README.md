@@ -1,5 +1,7 @@
 # Create Rss App
 
+<img alt="I'm lazy" align="right" src="https://user-images.githubusercontent.com/57856125/125196023-e912e700-e260-11eb-9190-459a60a17aad.png" width="20%" />
+
 CLI for create simple JS or TS project without webpack configuration
 
 Easiest way to start use modules in your js app
