@@ -20,7 +20,7 @@ const installDependencies = () => console.log('Installing packages... This might
 const successfullyCreated = (projectName) => {
   newLine();
   success('Your new js project successfully created!');
-  info(`Now, you can go to ${chalk.bold(chalk.white(projectName))} folder end start hucking :)`)
+  info(`Now, you can start hucking ;)`)
   newLine();
   def('  npm start');
   info('    Starts the development server.')
@@ -28,6 +28,7 @@ const successfullyCreated = (projectName) => {
   def('  npm run build');
   info('    Boundles your app into static files for deployment.');
   newLine(2);
+  info(`  But before, you should go to project dir: ${chalk.yellow('cd ' + projectName)}`)
   success('  Good luck!');
   newLine();
 };

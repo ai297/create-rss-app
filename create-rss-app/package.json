@@ -1,6 +1,6 @@
 {
   "name": "create-rss-app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI for create simple js (or ts) SPA application",
   "author": "Kris Casper",
   "license": "ISC",

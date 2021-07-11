@@ -3,12 +3,20 @@
 'use strict';
 
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 const out = require('./out');
 const { getPackageJson, getProjectPaths } = require('./helpers');
 
-const exitCode = (function() {
+const run = (cmd, ...args) => new Promise((res, rej) => {
+  const chp = spawn(cmd, args, { shell: true });
+  chp.stdout.on('data', (d) => console.log(d.toString()));
+  chp.stderr.on('data', (d) => console.error(d.toString()));
+  chp.on('error', (e) => rej(e.toString()));
+  chp.on('close', (code) => code === 0 ? res() : rej());
+});
+
+(async function() {
   const args = process.argv.slice(2);
   const projectNameIndex = args.findIndex(v => /^[a-z0-9_]+[a-z0-9-_]{1,64}$/i.test(v));
 
@@ -81,9 +89,11 @@ const exitCode = (function() {
   // Insatall dependencies.
   out.installDependencies();
   try {
-    const installResult = isConfigs
-      ? execSync(`cd ${projectRoot} && npm i`)
-      : execSync(`cd ${projectRoot} && npm i rss-scripts --save-dev`);
+    process.chdir(projectRoot);
+    const installProcess = isConfigs
+      ? run('npm', 'i')
+      : run('npm', 'i', 'rss-scripts', '--save-dev');
+    await installProcess;
     out.info('  + Dependencies installed.');
   } catch {
     out.error('  - Failed to install dependencies.');
@@ -92,9 +102,5 @@ const exitCode = (function() {
   }
 
   out.successfullyCreated(projectName);
-  process.chdir(projectRoot);
-  out.info('Current directory changed to project root dir.');
   return 0;
-})();
-
-process.exit(exitCode);
+})().then(exitCode => process.exit(exitCode));
