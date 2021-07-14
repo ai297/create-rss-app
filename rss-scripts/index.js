@@ -14,7 +14,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 });
 
 const projectRoot = path.resolve();
-const dirname = `dirname=${projectRoot}`;
+const dirname = `dirname="${projectRoot}"`;
 
 const scripts = {
   start: () => run('npx', 'webpack', 'serve', '--env', 'development=true', dirname),
@@ -26,5 +26,5 @@ if (!script || !scripts[script]) process.exit(1);
 
 process.chdir(__dirname);
 scripts[script]()
-  ?.then(() => process.exit(0))
+  .then(() => process.exit(0))
   .catch(() => process.exit(1));
