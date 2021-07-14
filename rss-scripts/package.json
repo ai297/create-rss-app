@@ -1,6 +1,6 @@
 {
   "name": "rss-scripts",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scripts for create-rss-app",
   "author": "Kris Casper",
   "license": "ISC",
@@ -11,6 +11,12 @@
   },
   "bin": {
     "rss-scripts": "./index.js"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "bugs": {
+    "url": "https://github.com/ai297/create-rss-app/issues"
   },
   "dependencies": {
     "clean-webpack-plugin": "^4.0.0-alpha.0",

@@ -2,6 +2,18 @@
 
 'use strict';
 
+const nodeVersion = process.versions.node.split('.')[0];
+
+if (nodeVersion < 14) {
+  console.error(
+    'You are running Node ' +
+      currentNodeVersion +
+      '.\n' +
+      'Please update your version of Node.'
+  );
+  process.exit(1);
+}
+
 const fs = require('fs');
 const { spawn } = require('child_process');
 const path = require('path');
