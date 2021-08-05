@@ -19,7 +19,7 @@ const getTsConfigPath = (projectDir) => {
 const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
-    port: 8080,
+    port: 5050,
     contentBase: '/',
   },
 };
