@@ -18,7 +18,7 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const path = require('path');
 const out = require('./out');
-const { getPackageJson, getProjectPaths } = require('./helpers');
+const createPackageJson = require('./packagejson');
 
 const run = (cmd, ...args) => new Promise((res, rej) => {
   const chp = spawn(cmd, args, { shell: true });
@@ -30,30 +30,29 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 
 (async function() {
   const args = process.argv.slice(2);
-  const projectNameIndex = args.findIndex(v => /^[a-z0-9_]+[a-z0-9-_]{1,64}$/i.test(v));
-
-  if (projectNameIndex < 0) return out.specifyProjectName();
+  const projectNameIndex = args.findIndex(v => /^[a-z0-9]+[a-z0-9-_]{1,64}$/i.test(v));
+  const projectDirName = projectNameIndex < 0 ? '.' : args.splice(projectNameIndex, 1)[0];
+  const projectRoot = path.resolve(projectDirName);
+  const projectName = path.basename(projectRoot);
+  const projectSrc = path.join(projectRoot, 'src');
+  const projectSrcImages = path.join(projectSrc, 'images');
+  const isNewDir = !fs.existsSync(projectRoot);
+  const removeProjectDir = () => isNewDir ? fs.rmdirSync(projectRoot, { recursive: true, force: true }) : undefined;
 
   const flags = args.filter(v => /^-[-a-z]{2,10}$/i.test(v)).map(v => v.toLowerCase());
   const isConfigs = flags.includes('--configs') || flags.includes('-c');
   const isUseTs = flags.includes('--typescript') || flags.includes('-ts');
+  const isEmpty = flags.includes('--empty');
 
-  const [ projectName ] = args.splice(projectNameIndex, 1);
   const templatePath = path.resolve(__dirname, 'template');
   const templateSrcPath = path.join(templatePath, 'src');
-  const { projectRoot, projectSrc, projectSrcImages, removeProjectDir } = getProjectPaths(projectName);
   out.startProcessing();
-
-  if(fs.existsSync(projectRoot)) {
-    out.directoryExists(projectName);
-    return 1;
-  }
 
   // Create project directories.
   try {
-    fs.mkdirSync(projectRoot);
-    fs.mkdirSync(projectSrc);
-    fs.mkdirSync(projectSrcImages);
+    if (isNewDir) fs.mkdirSync(projectRoot);
+    if (!isEmpty && !fs.existsSync(projectSrc)) fs.mkdirSync(projectSrc);
+    if (!isEmpty && !fs.existsSync(projectSrcImages)) fs.mkdirSync(projectSrcImages);
     out.info('  + Directories created.');
   } catch {
     out.error('  - Failed to create directories.');
@@ -62,10 +61,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 
   // Create package.json.
   try {
-    fs.writeFileSync(
-      path.join(projectRoot, 'package.json'),
-      JSON.stringify(getPackageJson(projectName, !isConfigs), undefined, 2),
-    );
+    createPackageJson(projectRoot, projectName, !isConfigs, isUseTs);
     out.info('  + The package.json created.')
   } catch {
     out.error('  - Failed to create package.json');
@@ -75,13 +71,16 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 
   // Create configs.
   if (isConfigs) try {
-    fs.copyFileSync(path.join(templatePath, 'webpack.config.js'), path.join(projectRoot, 'webpack.config.js'));
+    fs.copyFileSync(
+      path.join(templatePath, 'webpack.config.js'),
+      path.join(projectRoot, isUseTs ? 'webpack.config.ts' : 'webpack.config.js'),
+    );
   } catch {
     out.error('  - Failed to create webpack config...');
     removeProjectDir();
     return 1;
   }
-  if (isConfigs || isUseTs) try {
+  if (isConfigs && isUseTs) try {
     fs.copyFileSync(path.join(templatePath, 'tsconfig.json'), path.join(projectRoot, 'tsconfig.json'));
     fs.copyFileSync(path.join(templatePath, 'modules.d.ts'), path.join(projectRoot, 'modules.d.ts'));
   } catch {
@@ -92,12 +91,16 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   out.info('  + Config files created.');
 
   // Copy template files.
-  try {
-    // fs.copyFileSync(path.join(templatePath, '.gitignore'), path.join(projectRoot, '.gitignore'));
-    fs.copyFileSync(path.join(templateSrcPath, 'index.html'), path.join(projectSrc, 'index.html'));
-    fs.copyFileSync(path.join(templateSrcPath, 'index.js'), path.join(projectSrc, isUseTs ? 'index.ts' : 'index.js'));
-    fs.copyFileSync(path.join(templateSrcPath, 'style.css'), path.join(projectSrc, 'style.css'));
-    fs.copyFileSync(path.join(templateSrcPath, 'images', 'lazy.png'), path.join(projectSrcImages, 'lazy.png'));
+  if (!isEmpty) try {
+    const indexFile = path.join(projectSrc, 'index.html');
+    const scriptFile = path.join(projectSrc, isUseTs ? 'index.ts' : 'index.js');
+    const styleFile = path.join(projectSrc, 'style.css');
+    if (!fs.existsSync(indexFile) && !fs.existsSync(scriptFile)) {
+      fs.copyFileSync(path.join(templateSrcPath, 'images', 'lazy.png'), path.join(projectSrcImages, 'lazy.png'));
+    }
+    if (!fs.existsSync(indexFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.html'), indexFile);
+    if (!fs.existsSync(scriptFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.js'), scriptFile);
+    if (!fs.existsSync(styleFile)) fs.copyFileSync(path.join(templateSrcPath, 'style.css'), styleFile);
     out.info('  + Template created.');
   } catch {
     out.error('  - Failed to create project files.');
