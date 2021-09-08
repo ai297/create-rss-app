@@ -9,7 +9,7 @@ const newLine = (lines = 1, str = '') => lines > 0 && console.log(Array(lines - 
 const startProcessing = () => success('Createing a new simple js project...');
 const installDependencies = () => console.log('Installing packages... This might take a couple of minutes.');
 
-const successfullyCreated = (projectName) => {
+const successfullyCreated = (projectDir) => {
   newLine();
   success('Your new js project successfully created!');
   info(`Now, you can start hucking ;)`)
@@ -20,7 +20,7 @@ const successfullyCreated = (projectName) => {
   def('  npm run build');
   info('    Boundles your app into static files for deployment.');
   newLine(2);
-  info(`  But before, you should go to project dir: ${chalk.yellow('cd ' + projectName)}`)
+  if (projectDir != '.') info(`  But before, you should go to project dir: ${chalk.yellow('cd ' + projectDir)}`);
   success('  Good luck!');
   newLine();
 };

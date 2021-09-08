@@ -48,7 +48,7 @@ const typescript = {
 };
 
 function getPackageJson(baseConfig, name, isNoScript, isUseTs) {
-  baseConfig.name = name || baseConfig.name;
+  baseConfig.name = baseConfig.name || name || 'my-new-app';
   baseConfig.scripts = baseConfig.scripts || {};
 
   if (isNoScript) {

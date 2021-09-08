@@ -39,11 +39,11 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   const isNewDir = !fs.existsSync(projectRoot);
   const removeProjectDir = () => isNewDir ? fs.rmdirSync(projectRoot, { recursive: true, force: true }) : undefined;
 
-  const flags = args.filter(v => /^-[-a-z]{2,10}$/i.test(v)).map(v => v.toLowerCase());
+  const flags = args.filter(v => /^-(-)?[a-z]{1,10}$/i.test(v)).map(v => v.toLowerCase());
   const isConfigs = flags.includes('--configs') || flags.includes('-c');
   const isUseTs = flags.includes('--typescript') || flags.includes('-ts');
   const isEmpty = flags.includes('--empty');
-
+  
   const templatePath = path.resolve(__dirname, 'template');
   const templateSrcPath = path.join(templatePath, 'src');
   out.startProcessing();
@@ -70,25 +70,31 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   }
 
   // Create configs.
-  if (isConfigs) try {
-    fs.copyFileSync(
-      path.join(templatePath, 'webpack.config.js'),
-      path.join(projectRoot, isUseTs ? 'webpack.config.ts' : 'webpack.config.js'),
-    );
-  } catch {
-    out.error('  - Failed to create webpack config...');
-    removeProjectDir();
-    return 1;
+  if (isConfigs) {
+    try {
+      fs.copyFileSync(
+        path.join(templatePath, isUseTs ? 'webpack.config.ts' : 'webpack.config.js'),
+        path.join(projectRoot, 'webpack.config.js'),
+      );
+    } catch {
+      out.error('  - Failed to create webpack config...');
+      removeProjectDir();
+      return 1;
+    }
+    out.info('  + Webpack config created.');
   }
-  if (isConfigs && isUseTs) try {
-    fs.copyFileSync(path.join(templatePath, 'tsconfig.json'), path.join(projectRoot, 'tsconfig.json'));
-    fs.copyFileSync(path.join(templatePath, 'modules.d.ts'), path.join(projectRoot, 'modules.d.ts'));
-  } catch {
-    out.error('  - Failed to create tsconfig...');
-    removeProjectDir();
-    return 1;
+
+  if (isUseTs) {
+    try {
+      fs.copyFileSync(path.join(templatePath, 'tsconfig.json'), path.join(projectRoot, 'tsconfig.json'));
+      fs.copyFileSync(path.join(templatePath, 'modules.d.ts'), path.join(projectRoot, 'modules.d.ts'));
+    } catch {
+      out.error('  - Failed to create tsconfig...');
+      removeProjectDir();
+      return 1;
+    }
+    out.info('  + TS config created.');
   }
-  out.info('  + Config files created.');
 
   // Copy template files.
   if (!isEmpty) try {
@@ -123,6 +129,6 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
     return 1;
   }
 
-  out.successfullyCreated(projectName);
+  out.successfullyCreated(projectDirName);
   return 0;
 })().then(exitCode => process.exit(exitCode));
