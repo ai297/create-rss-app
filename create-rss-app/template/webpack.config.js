@@ -21,31 +21,9 @@ module.exports = ({ development }) => ({
     path: path.resolve(__dirname, 'dist'),
     assetModuleFilename: '[file]',
   },
+  target: ['web', 'es6'],
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets:  [
-              ['@babel/preset-env', { targets: 'defaults' }],
-            ],
-            plugins: [
-              [
-                '@babel/plugin-transform-runtime',
-                {
-                  'absoluteRuntime': false,
-                  'corejs': false,
-                  'helpers': true,
-                  'regenerator': true,
-                }
-              ]
-            ]
-          }
-        },
-      },
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|svg|webp)$/i,
         type: 'asset/resource',

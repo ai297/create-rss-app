@@ -7,7 +7,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const __ = (d) => d ?? __dirname;
 
-const getEntryPoint = (projectDir) => fs.existsSync(path.join(projectDir, 'src', 'index.ts'))
+const getEntryPoint = (isUseTs, projectDir) => isUseTs && fs.existsSync(path.join(projectDir, 'src', 'index.ts'))
   ? './index.ts'
   : './index.js';
 
@@ -18,6 +18,17 @@ const getTsConfigPath = (projectDir) => {
     : path.resolve(__dirname, './tsconfig.json');
 };
 
+const tsLoader = (isUseTs, projectDir) => isUseTs
+  ? [{
+    test: /\.[tj]s$/,
+    loader: require.resolve('ts-loader'),
+    options: {
+      configFile: getTsConfigPath(projectDir),
+    },
+    exclude: /node_modules/,
+  }]
+  : [];
+
 const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
@@ -25,26 +36,20 @@ const devServer = (isDev) => !isDev ? {} : {
   },
 };
 
-module.exports = ({ development, dirname }) => ({
+module.exports = ({ development, dirname, isUseTs }) => ({
   mode: development ? 'development' : 'production',
   devtool: development ? 'inline-source-map' : false,
-  entry: getEntryPoint(__(dirname)),
+  entry: getEntryPoint(isUseTs, __(dirname)),
   context: path.join(__(dirname), 'src'),
   output: {
     filename: 'bundle.[contenthash].js',
     path: path.join(__(dirname), 'dist'),
     assetModuleFilename: '[file]',
   },
+  target: ['web', 'es6'],
   module: {
     rules: [
-      {
-        test: /\.[tj]s$/,
-        loader: require.resolve('ts-loader'),
-        options: {
-          configFile: getTsConfigPath(__(dirname)),
-        },
-        exclude: /node_modules/,
-      },
+      ...tsLoader(isUseTs, __(dirname)),
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|svg|webp)$/i,
         type: 'asset/resource',
@@ -92,7 +97,7 @@ module.exports = ({ development, dirname }) => ({
     new CleanWebpackPlugin(),
   ],
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: isUseTs ? ['.ts', '.js'] : ['.js'],
   },
   ...devServer(development)
 });
