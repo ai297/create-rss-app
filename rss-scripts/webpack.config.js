@@ -7,7 +7,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 const __ = (d) => d ?? __dirname;
 
-const getEntryPoint = (projectDir) => fs.existsSync(path.join(projectDir, 'src', 'index.ts')) ? './index.ts' : './index.js';
+const getEntryPoint = (projectDir) => fs.existsSync(path.join(projectDir, 'src', 'index.ts'))
+  ? './index.ts'
+  : './index.js';
 
 const getTsConfigPath = (projectDir) => {
   const projectTsConfigPath = path.join(projectDir, 'tsconfig.json');
@@ -20,7 +22,6 @@ const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
     port: 5050,
-    contentBase: '/',
   },
 };
 

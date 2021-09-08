@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -14,7 +15,7 @@ const devServer = (isDev) => !isDev ? {} : {
 module.exports = ({ development }) => ({
   mode: development ? 'development' : 'production',
   devtool: development ? 'inline-source-map' : false,
-  entry: './index.js',
+  entry: fs.existsSync(path.resolve(__dirname, 'src', 'index.ts')) ? './index.ts' : './index.js',
   context: path.resolve(__dirname, 'src'),
   output: {
     filename: 'bundle.[contenthash].js',
@@ -24,27 +25,9 @@ module.exports = ({ development }) => ({
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.[tj]s$/,
+        use: 'ts-loader',
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets:  [
-              ['@babel/preset-env', { targets: 'defaults' }],
-            ],
-            plugins: [
-              [
-                '@babel/plugin-transform-runtime',
-                {
-                  'absoluteRuntime': false,
-                  'corejs': false,
-                  'helpers': true,
-                  'regenerator': true,
-                }
-              ]
-            ]
-          }
-        },
       },
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|svg|webp)$/i,
@@ -93,7 +76,7 @@ module.exports = ({ development }) => ({
     new CleanWebpackPlugin(),
   ],
   resolve: {
-    extensions: ['.js'],
+    extensions: ['.ts', '.js'],
   },
   ...devServer(development)
 });
