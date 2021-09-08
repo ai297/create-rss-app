@@ -9,6 +9,9 @@ const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
     port: 5050,
+    static: {
+      directory: path.resolve(__dirname, 'src'),
+    },
   },
 };
 

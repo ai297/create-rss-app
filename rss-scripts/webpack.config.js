@@ -5,8 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
-const __ = (d) => d ?? __dirname;
-
 const getEntryPoint = (isUseTs, projectDir) => isUseTs && fs.existsSync(path.join(projectDir, 'src', 'index.ts'))
   ? './index.ts'
   : './index.js';
@@ -29,27 +27,30 @@ const tsLoader = (isUseTs, projectDir) => isUseTs
   }]
   : [];
 
-const devServer = (isDev) => !isDev ? {} : {
+const devServer = (isDev, projectDir) => !isDev ? {} : {
   devServer: {
     open: true,
     port: 5050,
+    // static: {
+    //   directory: path.resolve(projectDir, 'src'),
+    // },
   },
 };
 
 module.exports = ({ development, dirname, isUseTs }) => ({
   mode: development ? 'development' : 'production',
   devtool: development ? 'inline-source-map' : false,
-  entry: getEntryPoint(isUseTs, __(dirname)),
-  context: path.join(__(dirname), 'src'),
+  entry: getEntryPoint(isUseTs, dirname),
+  context: path.join(dirname, 'src'),
   output: {
     filename: 'bundle.[contenthash].js',
-    path: path.join(__(dirname), 'dist'),
+    path: path.join(dirname, 'dist'),
     assetModuleFilename: '[file]',
   },
   target: ['web', 'es6'],
   module: {
     rules: [
-      ...tsLoader(isUseTs, __(dirname)),
+      ...tsLoader(isUseTs, dirname),
       {
         test: /\.(?:ico|gif|png|jpg|jpeg|svg|webp)$/i,
         type: 'asset/resource',
@@ -79,7 +80,7 @@ module.exports = ({ development, dirname, isUseTs }) => ({
       patterns: [
         {
           from: '**/*',
-          context: path.resolve(__(dirname), './src'),
+          context: path.resolve(dirname, './src'),
           globOptions: {
             ignore: [
               '**/*.js',
@@ -99,5 +100,5 @@ module.exports = ({ development, dirname, isUseTs }) => ({
   resolve: {
     extensions: isUseTs ? ['.ts', '.js'] : ['.js'],
   },
-  ...devServer(development)
+  ...devServer(development, dirname)
 });

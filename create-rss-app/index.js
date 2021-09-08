@@ -116,7 +116,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
       fs.copyFileSync(path.join(templateSrcPath, 'images', 'lazy.png'), path.join(projectSrcImages, 'lazy.png'));
     }
     if (!fs.existsSync(indexFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.html'), indexFile);
-    if (!fs.existsSync(scriptFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.js'), scriptFile);
+    if (!fs.existsSync(scriptFile)) fs.copyFileSync(path.join(templateSrcPath, `index.${isUseTs ? 't' : 'j'}s`), scriptFile);
     if (!fs.existsSync(styleFile)) fs.copyFileSync(path.join(templateSrcPath, 'style.css'), styleFile);
     out.info('  + Template created.');
   } catch {
