@@ -1,6 +1,6 @@
 {
   "name": "rss-scripts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Scripts for create-rss-app",
   "author": "Kris Casper",
   "license": "ISC",
@@ -13,7 +13,7 @@
     "rss-scripts": "./index.js"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">= 12"
   },
   "bugs": {
     "url": "https://github.com/ai297/create-rss-app/issues"

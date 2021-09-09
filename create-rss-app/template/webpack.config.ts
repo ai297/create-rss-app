@@ -8,7 +8,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 const devServer = (isDev) => !isDev ? {} : {
   devServer: {
     open: true,
-    port: 5050,
+    port: 'auto',
+    static: {
+      directory: path.resolve(__dirname, 'src'),
+      watch: true,
+    },
   },
 };
 

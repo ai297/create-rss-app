@@ -2,19 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const template = require('./template/package.json');
 
-const noConfig = {
-  scripts: {
-    start: 'rss-scripts start',
-    build: 'rss-scripts build',
-  }
-};
-
-const common = {
-  scripts: {
+const getScripts = (configs, useTs) => configs
+  ? {
     start: 'webpack serve --env development',
-    build: 'webpack'
-  },
-  devDependencies: {
+    build: 'webpack',
+  }
+  : {
+    start: `rss-scripts start${useTs ? ' -ts' : ''}`,
+    build: `rss-scripts build${useTs ? ' -ts' : ''}`,
+  };
+
+const getDevDependencies = (useTs) => Object.assign(
+  {
     'clean-webpack-plugin': '^4.0.0-alpha.0',
     'copy-webpack-plugin': '^8.1.1',
     'css-loader': '^5.2.4',
@@ -25,47 +24,20 @@ const common = {
     'webpack': '^5.36.2',
     'webpack-cli': '^4.6.0',
     'webpack-dev-server': '^4.1.1'
-  }
-};
-
-const babel = {
-  devDependencies: {
-    '@babel/core': '^7.15.5',
-    '@babel/plugin-transform-runtime': '^7.15.0',
-    '@babel/preset-env': '^7.15.4',
-    'babel-loader': '^8.2.2',
-  },
-  dependencies: {
-    '@babel/runtime': '^7.15.4'
-  }
-};
-
-const typescript = {
-  devDependencies: {
+  }, useTs ? {
     'ts-loader': '^9.2.3',
     'typescript': '^4.3.5',
-  }
-};
+  } : {});
 
-function getPackageJson(baseConfig, name, isNoScript, isUseTs) {
+function getPackageJson(baseConfig, name, isNoConfigs, isUseTs) {
   baseConfig.name = baseConfig.name || name || 'my-new-app';
   baseConfig.scripts = baseConfig.scripts || {};
+  baseConfig.scripts = Object.assign(baseConfig.scripts, getScripts(!isNoConfigs, isUseTs));
 
-  if (isNoScript) {
-    baseConfig.scripts = Object.assign(baseConfig.scripts, noConfig.scripts);
-    return baseConfig;
-  }
+  if (isNoConfigs) return baseConfig;
 
   baseConfig.devDependencies = baseConfig.devDependencies || {};
-  baseConfig.dependencies = baseConfig.dependencies || {};
-  baseConfig.scripts = Object.assign(baseConfig.scripts, common.scripts);
-  baseConfig.devDependencies = Object.assign(baseConfig.devDependencies, common.devDependencies);
-  baseConfig.devDependencies = isUseTs
-    ? Object.assign(baseConfig.devDependencies, typescript.devDependencies)
-    : Object.assign(baseConfig.devDependencies, babel.devDependencies);
-  baseConfig.dependencies = isUseTs
-    ? baseConfig.dependencies
-    : Object.assign(baseConfig.dependencies, babel.dependencies);
+  baseConfig.devDependencies = Object.assign(baseConfig.devDependencies, getDevDependencies(isUseTs));
 
   return baseConfig;
 }

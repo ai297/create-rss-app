@@ -43,7 +43,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   const isConfigs = flags.includes('--configs') || flags.includes('-c');
   const isUseTs = flags.includes('--typescript') || flags.includes('-ts');
   const isEmpty = flags.includes('--empty');
-  
+
   const templatePath = path.resolve(__dirname, 'template');
   const templateSrcPath = path.join(templatePath, 'src');
   out.startProcessing();
@@ -96,6 +96,17 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
     out.info('  + TS config created.');
   }
 
+  if (!isUseTs) {
+    try {
+      fs.copyFileSync(path.join(templatePath, 'jsconfig.json'), path.join(projectRoot, 'jsconfig.json'));
+    } catch {
+      out.error('  - Failed to create jsconfig...');
+      removeProjectDir();
+      return 1;
+    }
+    out.info('  + JS config created.');
+  }
+
   // Copy template files.
   if (!isEmpty) try {
     const indexFile = path.join(projectSrc, 'index.html');
@@ -105,7 +116,7 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
       fs.copyFileSync(path.join(templateSrcPath, 'images', 'lazy.png'), path.join(projectSrcImages, 'lazy.png'));
     }
     if (!fs.existsSync(indexFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.html'), indexFile);
-    if (!fs.existsSync(scriptFile)) fs.copyFileSync(path.join(templateSrcPath, 'index.js'), scriptFile);
+    if (!fs.existsSync(scriptFile)) fs.copyFileSync(path.join(templateSrcPath, `index.${isUseTs ? 't' : 'j'}s`), scriptFile);
     if (!fs.existsSync(styleFile)) fs.copyFileSync(path.join(templateSrcPath, 'style.css'), styleFile);
     out.info('  + Template created.');
   } catch {

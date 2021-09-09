@@ -16,15 +16,21 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
 const projectRoot = path.resolve();
 const dirname = `dirname="${projectRoot}"`;
 
-const scripts = {
-  start: () => run('npx', 'webpack', 'serve', '--env', 'development=true', dirname),
-  build: () => run('npx', 'webpack', '--env', dirname),
+const getEnv = (flags) => {
+  const env = [ dirname ];
+  if (flags.includes('-ts')) env.push('isUseTs=true');
+  return env;
 };
 
-const [ script ] = process.argv.slice(2);
+const scripts = {
+  start: (flags) => run('npx', 'webpack', 'serve', '--env', 'development=true', ...getEnv(flags)),
+  build: (flags) => run('npx', 'webpack', '--env', ...getEnv(flags)),
+};
+
+const [ script, ...flags ] = process.argv.slice(2).map(s => s.toLowerCase());
 if (!script || !scripts[script]) process.exit(1);
 
 process.chdir(__dirname);
-scripts[script]()
+scripts[script](flags)
   .then(() => process.exit(0))
   .catch(() => process.exit(1));

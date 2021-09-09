@@ -1,6 +1,6 @@
 import image from './images/lazy.png';
 
-const createImage = (src) => new Promise((res, rej) => {
+const createImage = (src: string) => new Promise<HTMLImageElement>((res, rej) => {
   const img = new Image();
   img.onload = () => res(img);
   img.onerror = rej;
