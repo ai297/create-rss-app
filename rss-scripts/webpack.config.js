@@ -30,10 +30,11 @@ const tsLoader = (isUseTs, projectDir) => isUseTs
 const devServer = (isDev, projectDir) => !isDev ? {} : {
   devServer: {
     open: true,
-    port: 5050,
-    // static: {
-    //   directory: path.resolve(projectDir, 'src'),
-    // },
+    port: 'auto',
+    static: {
+      directory: path.join(projectDir, 'src'),
+      watch: true,
+    },
   },
 };
 
