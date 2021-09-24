@@ -23,7 +23,8 @@ const getDevDependencies = (useTs) => Object.assign(
     'sass-loader': '^11.0.1',
     'webpack': '^5.36.2',
     'webpack-cli': '^4.6.0',
-    'webpack-dev-server': '^4.1.1'
+    'webpack-dev-server': '^4.1.1',
+    'webpack-remove-empty-scripts': '^0.7.1',
   }, useTs ? {
     'ts-loader': '^9.2.3',
     'typescript': '^4.3.5',

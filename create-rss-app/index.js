@@ -1,17 +1,15 @@
 #!/usr/bin/env node
 
 'use strict';
-
+const requiredNodeVersion = 12;
 const nodeVersion = process.versions.node.split('.')[0];
 
-if (nodeVersion < 14) {
+if (nodeVersion < requiredNodeVersion) {
   console.error(
-    'You are running Node ' +
-      currentNodeVersion +
-      '.\n' +
-      'Please update your version of Node.'
+    `You are running NodeJS ${nodeVersion}.\n`
+    `Please update your version of NodeJS up to ${requiredNodeVersion} or later.`
   );
-  process.exit(1);
+  process.exit(0);
 }
 
 const fs = require('fs');
@@ -33,6 +31,13 @@ const run = (cmd, ...args) => new Promise((res, rej) => {
   const projectNameIndex = args.findIndex(v => /^[a-z0-9]+[a-z0-9-_]{1,64}$/i.test(v));
   const projectDirName = projectNameIndex < 0 ? '.' : args.splice(projectNameIndex, 1)[0];
   const projectRoot = path.resolve(projectDirName);
+
+  if (projectRoot.includes(' ')) {
+    out.error('Project path should not contains spaces.');
+    out.info('...Also using of cyrillic chars is not recommended too.');
+    return 1;
+  }
+
   const projectName = path.basename(projectRoot);
   const projectSrc = path.join(projectRoot, 'src');
   const projectSrcImages = path.join(projectSrc, 'images');
