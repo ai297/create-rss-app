@@ -58,7 +58,7 @@ const getHtmlPlugins = (pages) => pages.map(({html, name, script, style}) => new
 }));
 
 module.exports = ({ development }) => {
-  const pages = getPages(srcPath);
+  const pages = getPages(srcPath, 1);
   return {
     mode: development ? 'development' : 'production',
     devtool: development ? 'inline-source-map' : false,
