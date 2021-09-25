@@ -84,7 +84,7 @@ module.exports = ({ development, dirname, isUseTs }) => {
     context: srcPath,
     output: {
       filename: 'js/[name].[contenthash].js',
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(dirname, 'dist'),
       assetModuleFilename: '[file]',
     },
     target: ['web', 'es6'],
@@ -105,11 +105,11 @@ module.exports = ({ development, dirname, isUseTs }) => {
         },
         {
           test: /\.css$/i,
-          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          use: [{loader: MiniCssExtractPlugin.loader, options: { publicPath: '../' }}, 'css-loader'],
         },
         {
           test: /\.s[ac]ss$/i,
-          use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+          use: [{loader: MiniCssExtractPlugin.loader, options: { publicPath: '../' }}, 'css-loader', 'sass-loader']
         }
       ],
     },
