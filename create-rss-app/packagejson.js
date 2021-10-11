@@ -14,20 +14,20 @@ const getScripts = (configs, useTs) => configs
 
 const getDevDependencies = (useTs) => Object.assign(
   {
-    'clean-webpack-plugin': '4.0.0-alpha.0',
-    'copy-webpack-plugin': '8.1.1',
-    'css-loader': '5.2.4',
-    'html-webpack-plugin': '5.3.1',
-    'mini-css-extract-plugin': '1.6.0',
-    'sass': '1.32.12',
-    'sass-loader': '11.0.1',
-    'webpack': '5.36.2',
-    'webpack-cli': '4.6.0',
-    'webpack-dev-server': '4.1.1',
-    'webpack-remove-empty-scripts': '0.7.1',
+    'clean-webpack-plugin': '^4.0.0',
+    'copy-webpack-plugin': '^8.1.1',
+    'css-loader': '^5.2.7',
+    'html-webpack-plugin': '^5.3.2',
+    'mini-css-extract-plugin': '^1.6.2',
+    'sass': '^1.42.1',
+    'sass-loader': '^11.1.1',
+    'webpack': '^5.58.1',
+    'webpack-cli': '^4.9.0',
+    'webpack-dev-server': '^4.3.1',
+    'webpack-remove-empty-scripts': '^0.7.1',
   }, useTs ? {
-    'ts-loader': '9.2.3',
-    'typescript': '4.3.5',
+    'ts-loader': '^9.2.6',
+    'typescript': '^4.4.3',
   } : {});
 
 function getPackageJson(baseConfig, name, isNoConfigs, isUseTs) {
